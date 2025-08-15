@@ -3,19 +3,180 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Мой Telegram WebApp</title>
+    <title>Online Shop</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f3f5;
+            color: #333;
+            text-align: center;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #0088cc;
+            margin-bottom: 20px;
+        }
+
+        img {
+            width: 300px;
+            height: auto;
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+
+        button {
+            background-color: #0088cc;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            font-size: 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 10px;
+        }
+
+        button:hover {
+            background-color: #005f8c;
+        }
+
+        /* Основной контент */
+        #main {
+            display: block;
+        }
+
+        /* Форма заказа - скрыта по умолчанию */
+        #orderForm {
+            display: none;
+            margin-top: 20px;
+        }
+
+        input {
+            display: block;
+            width: 80%;
+            margin: 10px auto;
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        .error {
+            color: red;
+            font-size: 14px;
+            margin: 10px 0;
+        }
+    </style>
 </head>
 <body>
-    <h1>Привет из Telegram Web App!</h1>
-    <button id="sendData">Отправить данные в бота</button>
+    <!-- Основное содержимое -->
+    <div id="main">
+        <h1>Online Shop</h1>
+
+        <!-- Используем онлайн картинку вместо локальной -->
+        <img src="https://png.pngtree.com/png-clipart/20210521/ourmid/pngtree-dessert-cheesecake-png-image_3312124.jpg" alt="Cheesecake">
+
+        <!-- Кнопка покупки -->
+        <button id="buy">Купить</button>
+    </div>
+
+    <!-- Форма заказа -->
+    <div id="orderForm">
+        <h2>Оформление заказа</h2>
+
+        <input type="text" id="name" placeholder="Имя (обязательно)">
+        <input type="email" id="email" placeholder="Email (необязательно)">
+        <input type="text" id="phone" placeholder="Телефон (обязательно)">
+
+        <div class="error" id="error"></div>
+
+        <button type="button" id="order">Оформить заказ</button>
+    </div>
 
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script>
-        const tg = window.Telegram.WebApp;
+        // Проверяем загрузку страницы
+        console.log("Страница загружена!");
+
+        // Подключение к Telegram WebApp
+        let tg = window.Telegram.WebApp;
+        console.log("Telegram WebApp:", tg);
+
+        // Расширяем на весь экран
         tg.expand();
 
-        document.getElementById("sendData").addEventListener("click", () => {
-            tg.sendData(JSON.stringify({message: "Привет, бот!"}));
+        // Получаем элементы
+        let buy = document.getElementById("buy");
+        let main = document.getElementById("main");
+        let orderForm = document.getElementById("orderForm");
+        let order = document.getElementById("order");
+        let error = document.getElementById("error");
+
+        console.log("Элементы найдены:", { buy, main, orderForm, order });
+
+        // ГЛАВНОЕ - обработчик кнопки "Купить"
+        buy.addEventListener("click", function() {
+            console.log("🎯 КНОПКА КУПИТЬ НАЖАТА!");
+
+            // Скрываем основное содержимое
+            main.style.display = "none";
+            console.log("Основное содержимое скрыто");
+
+            // Показываем форму
+            orderForm.style.display = "block";
+            console.log("Форма показана");
+        });
+
+        // Функция проверки данных
+        function validateForm(name, phone) {
+            if (name.length < 3) {
+                error.textContent = "Имя должно быть не меньше 3 символов";
+                return false;
+            }
+            if (phone.length < 5) {
+                error.textContent = "Телефон должен быть не меньше 5 символов";
+                return false;
+            }
+            error.textContent = "";
+            return true;
+        }
+
+        // Обработчик кнопки "Оформить заказ"
+        order.addEventListener("click", function() {
+            console.log("🎯 КНОПКА ОФОРМИТЬ ЗАКАЗ НАЖАТА!");
+
+            let name = document.getElementById("name").value.trim();
+            let email = document.getElementById("email").value.trim();
+            let phone = document.getElementById("phone").value.trim();
+
+            console.log("Данные:", { name, email, phone });
+
+            if (!validateForm(name, phone)) {
+                console.log("Валидация не прошла");
+                return;
+            }
+
+            let orderData = {
+                name: name,
+                email: email,
+                phone: phone
+            };
+
+            console.log("Отправляем данные:", orderData);
+
+            try {
+                tg.sendData(JSON.stringify(orderData));
+                console.log("Данные отправлены!");
+                tg.close();
+            } catch (e) {
+                console.error("Ошибка отправки:", e);
+            }
+        });
+
+        // Дополнительная проверка
+        window.addEventListener('load', function() {
+            console.log("Окно полностью загружено!");
+            console.log("Кнопка купить существует:", !!document.getElementById("buy"));
         });
     </script>
 </body>
